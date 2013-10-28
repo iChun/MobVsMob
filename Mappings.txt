@@ -1,0 +1,16 @@
+net.minecraft.scoreboard.Scoreboard
+func_96529_a -> Returns Score for a player and a ScoreboardObjective?
+field_96544_c -> Mappings of the objectives names (keys) to the ScoreboardObjective (value)
+func_96510_d -> getObjective(String objectiveName) -> returns a Map of the objective, returns (but not stores in field_96544_c) a blank Map if one does not exist
+func_96515_c -> removeObjective(String objectiveName) -> removes the objective from field_96544_c
+func_96511_d -> removeTeam(ScorePlayerTeam team) -> Removes a team and removes all users from the team
+func_96535_a -> createScoreObjective(String name, ScoreObjectiveCriteria) -> creates a new ScoreObjective based off the ScoreObjectiveCriteria. Will automatically add to ScoreObjective map and returns the new ScoreObjective
+
+net.minecraft.scoreboard.ScorePlayerTeam
+field_98301_h -> invisibleFriendlies -> True to be able to see friendlies that are invisible, false to not
+field_96675_b -> teamName -> Name of the team. Is set during creation and marked as final. This is not the named that is displayed, for internal use only!
+func_96661_b -> getName() -> returns the name of the team. This is not the named that is displayed, for internal use only!
+func_142053_d -> formatString(String par1String) -> returns the string with both the team colour prefix and suffix applied
+func_98297_h -> canSeeInvisibleFriendlies -> Returns if you can see invisible friendlies or not
+func_98299_i -> returns a form of bitmask depending on if friendly fire and/or can see invisible friendlies is on
+
