@@ -9,6 +9,7 @@ import ichun.core.config.IConfigUser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 
 import com.mobvsmob.client.core.PacketHandlerClient;
@@ -71,7 +72,10 @@ public class MobVsMob
 	public void load(FMLInitializationEvent event)
 	{
 		GameRegistry.registerPlayerTracker(new ConnectionHandler());
+		
 		proxy.initMod();
+		
+		MinecraftForge.EVENT_BUS.register(new com.mobvsmob.common.core.EventHandler());
 	}
 
 	public static int getNetId()
