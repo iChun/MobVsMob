@@ -12,6 +12,9 @@ net/
 paulscode/
 assets/forge/
 
+# iChunUtil #
+ichun/
+
 # MC/Forge files #
 deobfuscation_data*
 fml_at.cfg
