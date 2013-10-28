@@ -32,7 +32,7 @@ import cpw.mods.fml.common.network.NetworkModHandler;
 			versionBounds = "[" + iChunUtil.versionMC + "." + MobVsMob.versionMajor + ".0" + "," + iChunUtil.versionMC + "." + (MobVsMob.versionMajor + 1) + ".0" + ")"
 				)
 public class MobVsMob 
-implements IConfigUser
+	implements IConfigUser
 {
 	public static final int versionMajor = 0;
 	public static final int versionMinor = 0;
