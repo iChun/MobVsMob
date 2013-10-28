@@ -24,11 +24,13 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkModHandler;
 
 @Mod(modid = "MobVsMob", name = "MobVsMob",
-version = MobVsMob.version)
+			version = MobVsMob.version,
+			dependencies = "required-after:iChunUtil@[2.3.0,)"
+				)
 @NetworkMod(clientSideRequired = true,
-serverSideRequired = false,
-versionBounds = "[" + iChunUtil.versionMC + "." + MobVsMob.versionMajor + ".0" + "," + iChunUtil.versionMC + "." + (MobVsMob.versionMajor + 1) + ".0" + ")"
-		)
+			serverSideRequired = false,
+			versionBounds = "[" + iChunUtil.versionMC + "." + MobVsMob.versionMajor + ".0" + "," + iChunUtil.versionMC + "." + (MobVsMob.versionMajor + 1) + ".0" + ")"
+				)
 public class MobVsMob 
 implements IConfigUser
 {
