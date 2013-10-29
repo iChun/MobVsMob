@@ -1,0 +1,16 @@
+[{
+    "modid": "mobvsmob",
+    "name": "Mob Vs Mob",
+    "description": "A new take on modded PVP, fight as a monster with custom maps, gamemodes and scripts",
+    "version": "0.0.1",
+    "mcversion": "1.6.4",
+    "url": "http://mobvsmob.com/",
+    "updateUrl": "",
+    "authors": [ "iChun", "Kihira" ],
+    "credits": "Code by Kihira and iChun",
+    "logoFile": "",
+    "screenshots": [ ],
+    "parent": "",
+    "requiredMods": [ "Forge", "iChunUtil" ],
+    "dependencies": [  ]
+}]

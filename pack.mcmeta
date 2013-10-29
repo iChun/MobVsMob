@@ -1,0 +1,18 @@
+{
+  "pack": {
+    "pack_format": 1,
+    "description": "Mob Vs Mob Mod"
+  },
+  "language": {
+    "en_US": {
+      "name": "English",
+      "region": "US",
+      "bidirectional": false
+    }
+    "en_UK": {
+      "name": "English",
+      "region": "UK",
+      "bidirectional": false
+    }
+  }
+}
