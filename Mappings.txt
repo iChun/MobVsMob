@@ -5,6 +5,7 @@ func_96510_d -> getObjective(String objectiveName) -> returns a Map of the objec
 func_96515_c -> removeObjective(String objectiveName) -> removes the objective from field_96544_c
 func_96511_d -> removeTeam(ScorePlayerTeam team) -> Removes a team and removes all users from the team
 func_96535_a -> createScoreObjective(String name, ScoreObjectiveCriteria) -> creates a new ScoreObjective based off the ScoreObjectiveCriteria. Will automatically add to ScoreObjective map and returns the new ScoreObjective
+func_96519_k -> removeObjective(ScoreObjective scoreObjective)
 
 net.minecraft.scoreboard.ScorePlayerTeam
 field_98301_h -> seeInvisibleTeammates -> True to be able to see friendlies that are invisible, false to not

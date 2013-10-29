@@ -2,15 +2,13 @@ package com.mobvsmob.common.scoreboard;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.command.SyntaxErrorException;
+import net.minecraft.command.WrongUsageException;
+import net.minecraft.scoreboard.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public class ScoreboardHandler {
 
@@ -27,9 +25,9 @@ public class ScoreboardHandler {
 	 * @param player The player to be added to the team
 	 * @param teamName Name of the team
 	 */
-	public void addToTeam(EntityPlayer player, String teamName) {
+	public void addToTeam(String player, String teamName) {
 		ScorePlayerTeam scoreplayerteam = this.scoreboard.func_96508_e(teamName);
-		if (scoreplayerteam != null) this.scoreboard.addPlayerToTeam(player.username, scoreplayerteam);
+		if (scoreplayerteam != null) this.scoreboard.addPlayerToTeam(player, scoreplayerteam);
 		else throw new ScoreboardException("The team " + teamName + " doesn't exist!");
 	}
 
@@ -72,18 +70,27 @@ public class ScoreboardHandler {
 		this.scoreboard.func_96511_d(scoreplayerteam);
 	}
 
-	public void removePlayerFromTeam(EntityPlayer player, String teamName) {
+	/**
+	 * Removes a player from the team if they are in it
+	 * @param player The players name to be removed
+	 * @param team The team the player should be removed from
+	 */
+	public void removePlayerFromTeam(String player, ScorePlayerTeam team) {
+		this.scoreboard.removePlayerFromTeam(player, team);
+	}
+
+	public void removePlayerFromTeam(String player, String teamName) {
 		ScorePlayerTeam team = this.scoreboard.func_96508_e(teamName);
-		this.removePlayerFromTeam(player, team);
+		if (team == null) throw new ScoreboardException("The team " + teamName + " does not exist!");
+		else this.removePlayerFromTeam(player, team);
 	}
 
 	/**
-	 * Removes a player from the team if they are in it
-	 * @param player The player to be removed
-	 * @param team The team the player should be removed from
+	 * Removes the player from all teams
+	 * @param player The players name to be removed
 	 */
-	public void removePlayerFromTeam(EntityPlayer player, ScorePlayerTeam team) {
-		this.scoreboard.removePlayerFromTeam(player.username, team);
+	public void removePlayerFromAllTeams(String player) {
+		this.scoreboard.removePlayerFromTeams(player);
 	}
 
 	/**
@@ -105,7 +112,7 @@ public class ScoreboardHandler {
 	 * @return A Collection of teams
 	 */
 	public Collection getTeamList() {
-		Collection teamCollection = scoreboard.func_96525_g();
+		Collection teamCollection = this.scoreboard.func_96525_g();
 		if (teamCollection.size() > 0) return teamCollection;
 		else return null;
 	}
@@ -118,7 +125,170 @@ public class ScoreboardHandler {
 	public Collection getTeamMembers(String teamName) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
 		Collection collection = scoreplayerteam.getMembershipCollection();
-		if (collection.size() <= 0) return null;
+		if (collection.size() <= 0) throw new ScoreboardException("The team " + teamName + " has no members!");
+		else return collection;
+	}
+
+	/**
+	 * Sets the teams colour prefix
+	 * @param teamName Name of the team
+	 * @param teamColour The team colour
+	 */
+	public void setTeamColorPrefix(String teamName, String teamColour) {
+		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
+		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		EnumChatFormatting enumchatformatting = EnumChatFormatting.func_96300_b(teamColour);
+		scoreplayerteam.setNamePrefix(enumchatformatting.toString());
+	}
+
+	/**
+	 * Sets the teams colour suffix
+	 * @param teamName Name of the team
+	 * @param teamColour The team colour
+	 */
+	public void setTeamColorSuffix(String teamName, String teamColour) {
+		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
+		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		EnumChatFormatting enumchatformatting = EnumChatFormatting.func_96300_b(teamColour);
+		scoreplayerteam.setNameSuffix(enumchatformatting.toString());
+	}
+
+	/**
+	 * Sets if the team can inflict friendly damage
+	 * @param teamName Name of the team
+	 * @param friendlyFire True to enable, false to disable
+	 */
+	public void setTeamFriendlyFire(String teamName, boolean friendlyFire) {
+		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
+		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		scoreplayerteam.setAllowFriendlyFire(friendlyFire);
+	}
+
+	/**
+	 * Sets if the team can see invisible teammates
+	 * @param teamName Name of the team
+	 * @param friendlyInvisibles True to enable, false to disable
+	 */
+	public void setTeamSeeInvisibleFriendlies(String teamName, boolean friendlyInvisibles) {
+		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
+		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		scoreplayerteam.setSeeFriendlyInvisiblesEnabled(friendlyInvisibles);
+	}
+
+	/**
+	 * Returns the ScoreObjective by that name
+	 * @param objectiveName The name of the objective
+	 * @param par2 If this is true, will only return the ScoreObjective if it's not read-only
+	 * @return The ScoreObjective
+	 */
+	public ScoreObjective getScoreObjective(String objectiveName, boolean par2) {
+		ScoreObjective scoreobjective = this.scoreboard.getObjective(objectiveName);
+		if (scoreobjective == null) throw new ScoreboardException("The objective " + objectiveName + " doesn't exist!");
+		else if (par2 && scoreobjective.getCriteria().isReadOnly()) throw new ScoreboardException("The objective " + objectiveName + " is read-only!");
+		else return scoreobjective;
+	}
+
+	/**
+	 * Adds an objective based on the ScoreObjectiveCriteria
+	 * @param objectiveName Name of the objective
+	 * @param scoreObjectiveCriteria The ScoreObjectiveCriteria for the objective
+	 * @param displayName Display name of the objective
+	 */
+	public void addObjective(String objectiveName, ScoreObjectiveCriteria scoreObjectiveCriteria, String displayName) {
+		if (this.scoreboard.getObjective(objectiveName) != null) throw new ScoreboardException("The objective " + objectiveName + " already exists!");
+		else if ((objectiveName.length() > 16) || (objectiveName.length() == 0)) throw new ScoreboardException("The objective " + objectiveName + " is not the right length!");
+		if (displayName == null) scoreboard.func_96535_a(objectiveName, scoreObjectiveCriteria);
+		else {
+			if ((displayName.length() > 32) || (displayName.length() > 0)) throw new ScoreboardException("The objective " + objectiveName + " display name is not the right length!");
+			else this.scoreboard.func_96535_a(objectiveName, scoreObjectiveCriteria).setDisplayName(displayName);
+		}
+	}
+
+	public void addObjective(String objectiveName, String scoreObjectiveCriteriaName, String displayName) {
+		ScoreObjectiveCriteria scoreObjectiveCriteria = (ScoreObjectiveCriteria) ScoreObjectiveCriteria.field_96643_a.get(scoreObjectiveCriteriaName);
+		if (scoreObjectiveCriteriaName == null) throw new ScoreboardException("The objective criteria " + scoreObjectiveCriteriaName + " doesn't exist!");
+		else this.addObjective(objectiveName, scoreObjectiveCriteria, displayName);
+	}
+
+	public void addObjective(String objectiveName, String scoreObjectiveCriteriaName) {
+		this.addObjective(objectiveName, scoreObjectiveCriteriaName, null);
+	}
+
+	public void addObjective(String objectiveName, ScoreObjectiveCriteria scoreObjectiveCriteria) {
+		this.addObjective(objectiveName, scoreObjectiveCriteria, null);
+	}
+
+	/**
+	 * Removes the ScoreObjective
+	 * @param scoreObjective The ScoreObjective to remove
+	 */
+	public void removeObjective(ScoreObjective scoreObjective) {
+		this.scoreboard.func_96519_k(scoreObjective);
+	}
+
+	public void removeObjective(String objectiveName) {
+		ScoreObjective scoreObjective = this.getScoreObjective(objectiveName, false);
+		if (scoreObjective == null) throw new ScoreboardException("The objective " + objectiveName + " doesn't exist!");
+		else this.removeObjective(scoreObjective);
+	}
+
+	/**
+	 * Sets the players score for the ScoreObjective
+	 * @param player The players name
+	 * @param scoreObjectiveName The ScoreObjective name
+	 * @param playerScore The new score
+	 */
+	public void setPlayerScore(String player, String scoreObjectiveName, int playerScore) {
+		ScoreObjective scoreObjective = this.getScoreObjective(scoreObjectiveName, true);
+		if (scoreObjective == null) throw new ScoreboardException("The objective " + scoreObjectiveName + " does not exist!");
+		Score score = this.scoreboard.func_96529_a(player, scoreObjective);
+		if (score == null) throw new ScoreboardException("The score " + score + " does not exist!");
+		score.func_96647_c(playerScore);
+	}
+
+	/**
+	 * Increases the players score for the ScoreObjective
+	 * @param player The players name
+	 * @param scoreObjectiveName The ScoreObjective name
+	 * @param playerScore The increase in score
+	 */
+	public void increasePlayerScore(String player, String scoreObjectiveName, int playerScore) {
+		ScoreObjective scoreObjective = this.getScoreObjective(scoreObjectiveName, true);
+		if (scoreObjective == null) throw new ScoreboardException("The objective " + scoreObjectiveName + " does not exist!");
+		Score score = this.scoreboard.func_96529_a(player, scoreObjective);
+		if (score == null) throw new ScoreboardException("The score " + score + " does not exist!");
+		score.func_96649_a(playerScore);
+	}
+
+	/**
+	 * Decreases the players score for the ScoreObjective
+	 * @param player The players name
+	 * @param scoreObjectiveName The ScoreObjective name
+	 * @param playerScore The cecrease in score
+	 */
+	public void decreasePlayerScore(String player, String scoreObjectiveName, int playerScore) {
+		ScoreObjective scoreObjective = this.getScoreObjective(scoreObjectiveName, true);
+		if (scoreObjective == null) throw new ScoreboardException("The objective " + scoreObjectiveName + " does not exist!");
+		Score score = this.scoreboard.func_96529_a(player, scoreObjective);
+		if (score == null) throw new ScoreboardException("The score " + score + " does not exist!");
+		score.func_96646_b(playerScore);
+	}
+
+	/**
+	 * Resets all the scores for the player
+	 * @param player The players name
+	 */
+	public void resetPlayerScore(String player) {
+		scoreboard.func_96515_c(player);
+	}
+
+	/**
+	 * Returns a Collection of all the objectives
+	 * @return A Collection of objectives
+	 */
+	public Collection getObjectivesList() {
+		Collection collection = this.scoreboard.getScoreObjectives();
+		if (collection.size() <= 0) throw new ScoreboardException("There are no objectives!");
 		else return collection;
 	}
 }
