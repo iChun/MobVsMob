@@ -1,9 +1,5 @@
 package com.mobvsmob.common.scoreboard;
 
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.SyntaxErrorException;
-import net.minecraft.command.WrongUsageException;
 import net.minecraft.scoreboard.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
@@ -27,8 +23,8 @@ public class ScoreboardHandler {
 	 */
 	public void addToTeam(String player, String teamName) {
 		ScorePlayerTeam scoreplayerteam = this.scoreboard.func_96508_e(teamName);
-		if (scoreplayerteam != null) this.scoreboard.addPlayerToTeam(player, scoreplayerteam);
-		else throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		if (scoreplayerteam == null) throw new ScoreboardException("scoreboard.team.notFound", teamName);
+		else this.scoreboard.addPlayerToTeam(player, scoreplayerteam);
 	}
 
 	/**
@@ -50,15 +46,15 @@ public class ScoreboardHandler {
 	 * @param teamDisplayName Display name of the team
 	 */
 	public void createTeam(String teamName, String teamDisplayName) {
-		if (this.scoreboard.func_96508_e(teamName) != null) throw new ScoreboardException("The team " + teamName + " already exists!");
-		if ((teamName.length() < 17) && (teamName.length() != 0)) {
-			if (teamDisplayName == null) this.scoreboard.createTeam(teamName);
-			else {
-				if ((teamDisplayName.length() > 32) || (teamDisplayName.length() == 0)) throw new ScoreboardException("The team " + teamName + " display name is the incorrect length!");
-				else this.scoreboard.createTeam(teamName).setTeamName(teamDisplayName);
-			}
+		if (this.scoreboard.func_96508_e(teamName) != null) throw new ScoreboardException("scoreboard.team.alreadyExists", teamName);
+		if (teamName.length() > 16) throw new ScoreboardException("scoreboard.team.name.tooLong", teamName);
+		if (teamName.length() != 0) throw new ScoreboardException("scoreboard.team.name.tooShort");
+		if (teamDisplayName == null) this.scoreboard.createTeam(teamName);
+		else {
+			if (teamDisplayName.length() > 32) throw new ScoreboardException("scoreboard.team.displayName.tooLong", teamName);
+			if (teamDisplayName.length() == 0) throw new ScoreboardException("scoreboard.team.displayName.tooShort");
+			else this.scoreboard.createTeam(teamName).setTeamName(teamDisplayName);
 		}
-		else throw new ScoreboardException("The team " + teamName + " name is the incorrect length!");
 	}
 
 	/**
@@ -81,7 +77,7 @@ public class ScoreboardHandler {
 
 	public void removePlayerFromTeam(String player, String teamName) {
 		ScorePlayerTeam team = this.scoreboard.func_96508_e(teamName);
-		if (team == null) throw new ScoreboardException("The team " + teamName + " does not exist!");
+		if (team == null) throw new ScoreboardException("scoreboard.team.notFound", teamName);
 		else this.removePlayerFromTeam(player, team);
 	}
 
@@ -99,7 +95,8 @@ public class ScoreboardHandler {
 	 */
 	public void emptyTeam(String teamName) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
-		if (!scoreplayerteam.getMembershipCollection().isEmpty()) {
+		if (scoreplayerteam.getMembershipCollection().isEmpty()) throw new ScoreboardException("scoreboard.team.empty", teamName);
+		else {
 			for (Object playerObject : scoreplayerteam.getMembershipCollection()) {
 				String player = (String) playerObject;
 				this.scoreboard.removePlayerFromTeam(player, scoreplayerteam);
@@ -125,7 +122,7 @@ public class ScoreboardHandler {
 	public Collection getTeamMembers(String teamName) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
 		Collection collection = scoreplayerteam.getMembershipCollection();
-		if (collection.size() <= 0) throw new ScoreboardException("The team " + teamName + " has no members!");
+		if (collection.size() <= 0) throw new ScoreboardException("scoreboard.team.empty", teamName);
 		else return collection;
 	}
 
@@ -136,7 +133,7 @@ public class ScoreboardHandler {
 	 */
 	public void setTeamColorPrefix(String teamName, String teamColour) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
-		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		if (scoreplayerteam == null) throw new ScoreboardException("scoreboard.team.notFound", teamName);
 		EnumChatFormatting enumchatformatting = EnumChatFormatting.func_96300_b(teamColour);
 		scoreplayerteam.setNamePrefix(enumchatformatting.toString());
 	}
@@ -148,7 +145,7 @@ public class ScoreboardHandler {
 	 */
 	public void setTeamColorSuffix(String teamName, String teamColour) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
-		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		if (scoreplayerteam == null) throw new ScoreboardException("scoreboard.team.notFound", teamName);
 		EnumChatFormatting enumchatformatting = EnumChatFormatting.func_96300_b(teamColour);
 		scoreplayerteam.setNameSuffix(enumchatformatting.toString());
 	}
@@ -160,7 +157,7 @@ public class ScoreboardHandler {
 	 */
 	public void setTeamFriendlyFire(String teamName, boolean friendlyFire) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
-		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		if (scoreplayerteam == null) throw new ScoreboardException("scoreboard.team.notFound", teamName);
 		scoreplayerteam.setAllowFriendlyFire(friendlyFire);
 	}
 
@@ -171,7 +168,7 @@ public class ScoreboardHandler {
 	 */
 	public void setTeamSeeInvisibleFriendlies(String teamName, boolean friendlyInvisibles) {
 		ScorePlayerTeam scoreplayerteam = this.getTeam(teamName);
-		if (scoreplayerteam == null) throw new ScoreboardException("The team " + teamName + " doesn't exist!");
+		if (scoreplayerteam == null) throw new ScoreboardException("scoreboard.team.notFound", teamName);
 		scoreplayerteam.setSeeFriendlyInvisiblesEnabled(friendlyInvisibles);
 	}
 
@@ -183,8 +180,8 @@ public class ScoreboardHandler {
 	 */
 	public ScoreObjective getScoreObjective(String objectiveName, boolean par2) {
 		ScoreObjective scoreobjective = this.scoreboard.getObjective(objectiveName);
-		if (scoreobjective == null) throw new ScoreboardException("The objective " + objectiveName + " doesn't exist!");
-		else if (par2 && scoreobjective.getCriteria().isReadOnly()) throw new ScoreboardException("The objective " + objectiveName + " is read-only!");
+		if (scoreobjective == null) throw new ScoreboardException("scoreboard.objective.notFound", objectiveName);
+		else if (par2 && scoreobjective.getCriteria().isReadOnly()) throw new ScoreboardException("scoreboard.objective.readOnly", objectiveName);
 		else return scoreobjective;
 	}
 
@@ -195,18 +192,20 @@ public class ScoreboardHandler {
 	 * @param displayName Display name of the objective
 	 */
 	public void addObjective(String objectiveName, ScoreObjectiveCriteria scoreObjectiveCriteria, String displayName) {
-		if (this.scoreboard.getObjective(objectiveName) != null) throw new ScoreboardException("The objective " + objectiveName + " already exists!");
-		else if ((objectiveName.length() > 16) || (objectiveName.length() == 0)) throw new ScoreboardException("The objective " + objectiveName + " is not the right length!");
+		if (this.scoreboard.getObjective(objectiveName) != null) throw new ScoreboardException("scoreboard.objective.notFound", objectiveName);
+		else if (objectiveName.length() > 16) throw new ScoreboardException("scoreboard.objective.name.tooLong", objectiveName);
+		if (objectiveName.length() == 0) throw new ScoreboardException("scoreboard.objective.name.tooShort");
 		if (displayName == null) scoreboard.func_96535_a(objectiveName, scoreObjectiveCriteria);
 		else {
-			if ((displayName.length() > 32) || (displayName.length() > 0)) throw new ScoreboardException("The objective " + objectiveName + " display name is not the right length!");
-			else this.scoreboard.func_96535_a(objectiveName, scoreObjectiveCriteria).setDisplayName(displayName);
+			if (displayName.length() > 32) throw new ScoreboardException("scoreboard.objective.displayName.tooLong", objectiveName);
+			if (displayName.length() == 0) throw new ScoreboardException("scoreboard.objective.displayName.tooShort");
+			this.scoreboard.func_96535_a(objectiveName, scoreObjectiveCriteria).setDisplayName(displayName);
 		}
 	}
 
 	public void addObjective(String objectiveName, String scoreObjectiveCriteriaName, String displayName) {
 		ScoreObjectiveCriteria scoreObjectiveCriteria = (ScoreObjectiveCriteria) ScoreObjectiveCriteria.field_96643_a.get(scoreObjectiveCriteriaName);
-		if (scoreObjectiveCriteriaName == null) throw new ScoreboardException("The objective criteria " + scoreObjectiveCriteriaName + " doesn't exist!");
+		if (scoreObjectiveCriteriaName == null) throw new ScoreboardException("scoreboard.objective.criteria.notFound", scoreObjectiveCriteriaName);
 		else this.addObjective(objectiveName, scoreObjectiveCriteria, displayName);
 	}
 
@@ -228,7 +227,7 @@ public class ScoreboardHandler {
 
 	public void removeObjective(String objectiveName) {
 		ScoreObjective scoreObjective = this.getScoreObjective(objectiveName, false);
-		if (scoreObjective == null) throw new ScoreboardException("The objective " + objectiveName + " doesn't exist!");
+		if (scoreObjective == null) throw new ScoreboardException("scoreboard.objective.notFound", objectiveName);
 		else this.removeObjective(scoreObjective);
 	}
 
@@ -240,9 +239,9 @@ public class ScoreboardHandler {
 	 */
 	public void setPlayerScore(String player, String scoreObjectiveName, int playerScore) {
 		ScoreObjective scoreObjective = this.getScoreObjective(scoreObjectiveName, true);
-		if (scoreObjective == null) throw new ScoreboardException("The objective " + scoreObjectiveName + " does not exist!");
+		if (scoreObjective == null) throw new ScoreboardException("scoreboard.objective.notFound", scoreObjectiveName);
 		Score score = this.scoreboard.func_96529_a(player, scoreObjective);
-		if (score == null) throw new ScoreboardException("The score " + score + " does not exist!");
+		if (score == null) throw new ScoreboardException("scoreboard.score.notFound", score);
 		score.func_96647_c(playerScore);
 	}
 
@@ -254,9 +253,9 @@ public class ScoreboardHandler {
 	 */
 	public void increasePlayerScore(String player, String scoreObjectiveName, int playerScore) {
 		ScoreObjective scoreObjective = this.getScoreObjective(scoreObjectiveName, true);
-		if (scoreObjective == null) throw new ScoreboardException("The objective " + scoreObjectiveName + " does not exist!");
+		if (scoreObjective == null) throw new ScoreboardException("scoreboard.objective.notFound", scoreObjectiveName);
 		Score score = this.scoreboard.func_96529_a(player, scoreObjective);
-		if (score == null) throw new ScoreboardException("The score " + score + " does not exist!");
+		if (score == null) throw new ScoreboardException("scoreboard.score.notFound", score);
 		score.func_96649_a(playerScore);
 	}
 
@@ -268,9 +267,9 @@ public class ScoreboardHandler {
 	 */
 	public void decreasePlayerScore(String player, String scoreObjectiveName, int playerScore) {
 		ScoreObjective scoreObjective = this.getScoreObjective(scoreObjectiveName, true);
-		if (scoreObjective == null) throw new ScoreboardException("The objective " + scoreObjectiveName + " does not exist!");
+		if (scoreObjective == null) throw new ScoreboardException("scoreboard.objective.notFound", scoreObjectiveName);
 		Score score = this.scoreboard.func_96529_a(player, scoreObjective);
-		if (score == null) throw new ScoreboardException("The score " + score + " does not exist!");
+		if (score == null) throw new ScoreboardException("scoreboard.score.notFound", score);
 		score.func_96646_b(playerScore);
 	}
 
@@ -288,7 +287,7 @@ public class ScoreboardHandler {
 	 */
 	public Collection getObjectivesList() {
 		Collection collection = this.scoreboard.getScoreObjectives();
-		if (collection.size() <= 0) throw new ScoreboardException("There are no objectives!");
+		if (collection.size() <= 0) throw new ScoreboardException("scoreboard.objective.noneExist");
 		else return collection;
 	}
 }

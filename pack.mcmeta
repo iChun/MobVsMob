@@ -9,9 +9,9 @@
       "region": "US",
       "bidirectional": false
     }
-    "en_UK": {
+    "en_GB": {
       "name": "English",
-      "region": "UK",
+      "region": "GB",
       "bidirectional": false
     }
   }

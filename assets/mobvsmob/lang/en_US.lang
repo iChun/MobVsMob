@@ -1,0 +1,18 @@
+scoreboard.team.notFound=Could not find team '%s'
+scoreboard.team.alreadyExists=The team '%s' already exists
+scoreboard.team.empty=The team '%s' is empty
+scoreboard.team.name.tooLong=The team name '%s' is too long
+scoreboard.team.name.tooShort=A team name cannot have a length equal to 0
+scoreboard.team.displayName.tooLong=The team '%s' display name is too long
+scoreboard.team.displayName.tooShort=The team '%s' display name cannot have a length equal to 0
+scoreboard.objective.noneExist=No objectives currently exist
+scoreboard.objective.notFound=Could not find objective '%s'
+scoreboard.objective.readOnly=The objective '%s' is read-only
+scoreboard.objective.name.tooLong=The objective name '%s' is too long
+scoreboard.objective.name.tooShort=The objective name length cannot equal to 0
+scoreboard.objective.displayName.tooLong=The objective '%s' display name is too long
+scoreboard.objective.displayName.tooShort=The objective display name length cannot equal to 0
+scoreboard.objective.criteria.notFound=Could not find objective criteria '%s'
+scoreboard.score.notFound=Could not find score '%s'
+
+
