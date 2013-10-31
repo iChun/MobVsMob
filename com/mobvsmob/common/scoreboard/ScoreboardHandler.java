@@ -5,15 +5,20 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 public class ScoreboardHandler {
 
-	public final int dimensionID;
 	private final Scoreboard scoreboard;
 
+	public static final HashMap<Integer, ScoreboardHandler> scoreboardHandlers = new HashMap<Integer, ScoreboardHandler>();
+
 	public ScoreboardHandler(int dimID) {
-		this.dimensionID = dimID;
-		this.scoreboard = MinecraftServer.getServer().worldServerForDimension(dimID).getScoreboard();
+		if (scoreboardHandlers.containsKey(dimID)) throw new IllegalArgumentException("A scoreboard handler has already been registered for dimension" + dimID);
+		else {
+			this.scoreboard = MinecraftServer.getServer().worldServerForDimension(dimID).getScoreboard();
+			scoreboardHandlers.put(dimID, this);
+		}
 	}
 
 	/**
